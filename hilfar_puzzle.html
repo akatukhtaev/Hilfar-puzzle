@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#10162f">
+<title>HILFAR PUZZLE</title>
+<style>
+:root{--bg:#10162f;--panel:#1b2345;--panel2:#252f59;--text:#f7f8ff;--muted:#b6c0e8;--gold:#ffd166}
+*{box-sizing:border-box} body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#29396d 0%,var(--bg) 58%);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);display:flex;justify-content:center;padding:18px 14px calc(20px + env(safe-area-inset-bottom))}
+.app{width:min(100%,460px)} header{text-align:center;padding:8px 0 18px} .logo{font-size:12px;letter-spacing:5px;color:#9fafff;font-weight:800}.title{font-size:30px;font-weight:900;letter-spacing:1px;margin:5px 0}.subtitle{font-size:13px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}.stat{background:#1b2345d9;border:1px solid #6574b54d;border-radius:16px;padding:11px 5px;text-align:center}.stat label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px}.stat strong{font-size:22px}
+.goal{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(100deg,#323e72,#252e57);padding:13px 15px;border-radius:15px;margin-bottom:14px;border:1px solid #8394ed33}.goal small{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}.goal strong{font-size:17px}.progress{height:7px;background:#10162f;border-radius:20px;overflow:hidden;margin-top:8px;width:190px;max-width:52vw}.bar{height:100%;width:0;background:linear-gradient(90deg,#70e1f5,#a78bfa);transition:width .25s}
+.board-wrap{padding:9px;background:#0d1228;border-radius:20px;border:1px solid #7788df50;box-shadow:0 14px 35px #0005}.board{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;touch-action:manipulation}.tile{aspect-ratio:1;border:0;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:clamp(19px,6vw,27px);cursor:pointer;box-shadow:inset 0 -4px 0 #0002,0 2px 4px #0002;transition:transform .12s,filter .12s;user-select:none;-webkit-tap-highlight-color:transparent}.tile:active{transform:scale(.9)}.tile.selected{outline:3px solid white;outline-offset:1px;transform:scale(.92);filter:brightness(1.15)}.tile.empty{visibility:hidden}.c0{background:linear-gradient(145deg,#ff8aa7,#ed4775)}.c1{background:linear-gradient(145deg,#ffd978,#ff9d39)}.c2{background:linear-gradient(145deg,#87f0ca,#20b88d)}.c3{background:linear-gradient(145deg,#8ed8ff,#3886f5)}.c4{background:linear-gradient(145deg,#d4a5ff,#8a58e8)}.c5{background:linear-gradient(145deg,#fff2a0,#e6c23e)}
+.hint{text-align:center;color:var(--muted);font-size:12px;line-height:1.5;margin:12px 5px 14px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:1px solid #8494e04d;border-radius:14px;padding:13px 12px;background:#27325f;color:white;font-weight:750;font-size:14px}.btn.primary{background:linear-gradient(100deg,#8174ff,#4e8df7);border:0}.message{min-height:25px;text-align:center;color:var(--gold);font-size:13px;font-weight:700;padding-top:11px}
+.overlay{position:fixed;inset:0;background:#070b1dcc;display:none;align-items:center;justify-content:center;padding:25px;z-index:10}.modal{width:min(100%,340px);background:#20294f;border:1px solid #8494e066;border-radius:24px;padding:25px;text-align:center;box-shadow:0 25px 70px #0008}.modal h2{margin:4px 0 8px;font-size:26px}.modal p{color:var(--muted);line-height:1.5;font-size:14px}.modal .btn{width:100%;margin-top:8px}
+footer{text-align:center;color:#7785b8;font-size:10px;letter-spacing:2px;margin-top:20px}
+@media(min-width:430px){.tile{font-size:27px}.board{gap:6px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header><div class="logo">H I L F A R</div><div class="title">PUZZLE ✦</div><div class="subtitle">Соединяй цвета. Открывай уровни.</div></header>
+<section class="stats">
+ <div class="stat"><label>Уровень</label><strong id="level">1</strong></div>
+ <div class="stat"><label>Очки</label><strong id="score">0</strong></div>
+ <div class="stat"><label>Ходы</label><strong id="moves">20</strong></div>
+</section>
+<section class="goal"><div><small>ЦЕЛЬ УРОВНЯ</small><strong><span id="target">500</span> очков</strong><div class="progress"><div class="bar" id="bar"></div></div></div><div style="font-size:35px">🏆</div></section>
+<div class="board-wrap"><div class="board" id="board" aria-label="Игровое поле"></div></div>
+<div class="hint">Нажми на фишку, затем на соседнюю, чтобы поменять их местами.<br>Собери 3 или больше одинаковых фишек в ряд.</div>
+<div class="actions"><button class="btn primary" id="newGame">↻ Новая игра</button><button class="btn" id="shuffle">⤨ Перемешать</button></div>
+<div class="message" id="message">Удачи! Собери свою первую комбинацию.</div>
+<footer>HILFAR PUZZLE · MINI GAME</footer>
+</main>
+<div class="overlay" id="overlay"><div class="modal"><div style="font-size:48px" id="modalIcon">🎉</div><h2 id="modalTitle">Уровень пройден!</h2><p id="modalText">Отличная работа.</p><button class="btn primary" id="modalButton">Следующий уровень</button></div></div>
+<script>
+(()=>{
+const N=8, emojis=['🍓','🍊','🍀','💎','🍇','⭐'];
+let grid=[],selected=-1,level=1,score=0,moves=20,target=500,busy=false;
+const $=id=>document.getElementById(id);
+function rand(){return Math.floor(Math.random()*6)}
+function initial(){grid=Array(N*N).fill(0).map(rand);for(let i=0;i<N*N;i++){while((i%N>=2&&grid[i]===grid[i-1]&&grid[i]===grid[i-2])||(i>=2*N&&grid[i]===grid[i-N]&&grid[i]===grid[i-2*N]))grid[i]=rand()} }
+function render(){const b=$('board');b.innerHTML='';grid.forEach((v,i)=>{const d=document.createElement('button');d.className='tile '+(v<0?'empty':'c'+v)+(selected===i?' selected':'');d.textContent=v<0?'':emojis[v];d.setAttribute('aria-label',v<0?'пусто':emojis[v]);d.onclick=()=>tap(i);b.appendChild(d)});$('level').textContent=level;$('score').textContent=score;$('moves').textContent=moves;$('target').textContent=target;$('bar').style.width=Math.min(100,score/target*100)+'%'}
+function matches(){let s=new Set();for(let r=0;r<N;r++)for(let c=0;c<N;c++){let i=r*N+c,v=grid[i];if(v<0)continue;if(c<N-2&&grid[i+1]===v&&grid[i+2]===v){let k=c;while(k<N&&grid[r*N+k]===v)s.add(r*N+k++);}if(r<N-2&&grid[i+N]===v&&grid[i+2*N]===v){let k=r;while(k<N&&grid[k*N+c]===v)s.add(k*N+c);}}return [...s]}
+function swap(a,b){[grid[a],grid[b]]=[grid[b],grid[a]]}
+function tap(i){if(busy||grid[i]<0)return;if(selected<0){selected=i;render();return}if(selected===i){selected=-1;render();return}let a=selected;selected=-1;if(Math.abs(a-i)!==N&&!(Math.floor(a/N)===Math.floor(i/N)&&Math.abs(a-i)===1)){selected=i;render();return}swap(a,i);let m=matches();if(!m.length){swap(a,i);$('message').textContent='Нужна комбинация из 3 одинаковых фишек';render();return}moves--;render();resolve()}
+function resolve(){busy=true;let m=matches(),chain=0;function step(){m=matches();if(!m.length){busy=false;render();if(score>=target){showModal(true)}else if(moves<=0){showModal(false)}else{$('message').textContent='Отлично! Продолжай собирать комбинации.'}return}chain++;score+=m.length*10*chain;$('message').textContent='+'+(m.length*10*chain)+' очков!';m.forEach(i=>grid[i]=-1);render();setTimeout(()=>{for(let c=0;c<N;c++){let vals=[];for(let r=N-1;r>=0;r--){let v=grid[r*N+c];if(v>=0)vals.push(v)}while(vals.length<N)vals.push(rand());for(let r=N-1,j=0;r>=0;r--,j++)grid[r*N+c]=vals[j]}render();setTimeout(step,130)},180)}setTimeout(step,100)}
+function showModal(won){$('overlay').style.display='flex';$('modalIcon').textContent=won?'🏆':'💫';$('modalTitle').textContent=won?'Уровень пройден!':'Попробуем ещё раз?';$('modalText').textContent=won?`Ты набрал ${score} очков. Готов к уровню ${level+1}?`:'Ходы закончились. Нажми, чтобы начать уровень заново.';$('modalButton').textContent=won?'Следующий уровень':'Повторить';$('modalButton').onclick=()=>{if(won){level++;target+=300;moves=20+Math.min(level,10);score=0}else{score=0;moves=20+Math.min(level,10)}$('overlay').style.display='none';newBoard()}}
+function newBoard(){selected=-1;initial();let tries=0;while(!matches().length&&tries++<5)initial();render();$('message').textContent='Собери комбинацию из трёх фишек!'}
+$('newGame').onclick=()=>{level=1;score=0;moves=20;target=500;newBoard()};
+$('shuffle').onclick=()=>{if(busy)return;initial();selected=-1;render();$('message').textContent='Поле перемешано. Найди комбинацию!'};
+newBoard();
+})();
+</script>
+</body>
+</html>
